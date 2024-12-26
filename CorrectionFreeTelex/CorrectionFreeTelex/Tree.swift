@@ -1,112 +1,92 @@
 struct Node {
-	let character: Character
 	let mapping: String
-	let children: [Node]
+	let children: [Character: Node]
 }
 
-let rootNodes = [
-	Node(
-		character: "a",
+let rootNodes: [Character: Node] = [
+	"a": Node(
 		mapping: "a",
 		children: [
-			Node(
-				character: "a",
+			"a": Node(
 				mapping: "â",
 				children: [
-					Node(
-						character: "a",
+					"a": Node(
 						mapping: "aa",
-						children: []
+						children: [:]
 					)
 				]
 			),
-			Node(
-				character: "w",
+			"w": Node(
 				mapping: "ă",
 				children: [
-					Node(
-						character: "w",
+					"w": Node(
 						mapping: "aw",
-						children: []
+						children: [:]
 					)
 				]
 			),
 		]
 	),
-	Node(
-		character: "d",
+	"d": Node(
 		mapping: "d",
 		children: [
-			Node(
-				character: "d",
+			"d": Node(
 				mapping: "đ",
 				children: [
-					Node(
-						character: "d",
+					"d": Node(
 						mapping: "dd",
-						children: []
+						children: [:]
 					)
 				]
 			)
 		]
 	),
-	Node(
-		character: "e",
+	"e": Node(
 		mapping: "e",
 		children: [
-			Node(
-				character: "e",
+			"e": Node(
 				mapping: "ê",
 				children: [
-					Node(
-						character: "e",
+					"e": Node(
 						mapping: "ee",
-						children: []
+						children: [:]
 					)
 				]
 			)
 		]
 	),
-	Node(
-		character: "o",
+	"o": Node(
 		mapping: "o",
 		children: [
-			Node(
-				character: "o",
+			"o": Node(
 				mapping: "ô",
 				children: [
-					Node(
-						character: "o",
+					"o": Node(
 						mapping: "oo",
-						children: []
+						children: [:]
 					)
 				]
 			),
-			Node(
-				character: "w",
+			"w": Node(
 				mapping: "ơ",
 				children: [
-					Node(
-						character: "w",
+					"w": Node(
 						mapping: "ow",
-						children: []
+						children: [:]
 					)
 				]
 			)
 		]
 	),
-	Node(
-		character: "u",
+	"u": Node(
 		mapping: "u",
 		children: [
-			Node(
-				character: "w",
+			"w": Node(
 				mapping: "ư",
 				children: [
-					Node(
-						character: "w",
+					"w": Node(
 						mapping: "uw",
-						children: []
+						children: [:]
 					)
 				]
 			)

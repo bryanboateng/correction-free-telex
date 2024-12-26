@@ -75,9 +75,7 @@ class InputController: IMKInputController {
 
 	private func nextNode(matching targetCharacter: Character) -> Node? {
 		let searchSpace = self.currentNode?.children ?? rootNodes
-		return searchSpace.first { node in
-			node.character == targetCharacter
-		}
+		return searchSpace[targetCharacter]
 	}
 
 	private func commitNodeIfLeafElseMark(
