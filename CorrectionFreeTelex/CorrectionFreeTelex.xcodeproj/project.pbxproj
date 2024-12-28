@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B66B78D12D1F64CA005CD36C /* NonEmpty in Frameworks */ = {isa = PBXBuildFile; productRef = B66B78D02D1F64CA005CD36C /* NonEmpty */; };
+		B67E4E062D1F376200F05334 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = B67E4E052D1F376200F05334 /* Algorithms */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		B6AAA6932D1B90E6008EE91D /* CorrectionFreeTelex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CorrectionFreeTelex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B66B78D12D1F64CA005CD36C /* NonEmpty in Frameworks */,
+				B67E4E062D1F376200F05334 /* Algorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = CorrectionFreeTelex;
 			packageProductDependencies = (
+				B67E4E052D1F376200F05334 /* Algorithms */,
+				B66B78D02D1F64CA005CD36C /* NonEmpty */,
 			);
 			productName = CorrectionFreeTelex;
 			productReference = B6AAA6932D1B90E6008EE91D /* CorrectionFreeTelex.app */;
@@ -107,6 +116,10 @@
 			);
 			mainGroup = B6AAA68A2D1B90E6008EE91D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B67E4E042D1F376200F05334 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				B66B78CF2D1F64CA005CD36C /* XCRemoteSwiftPackageReference "swift-nonempty" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B6AAA6942D1B90E6008EE91D /* Products */;
 			projectDirPath = "";
@@ -338,6 +351,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B66B78CF2D1F64CA005CD36C /* XCRemoteSwiftPackageReference "swift-nonempty" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-nonempty";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.0;
+			};
+		};
+		B67E4E042D1F376200F05334 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B66B78D02D1F64CA005CD36C /* NonEmpty */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B66B78CF2D1F64CA005CD36C /* XCRemoteSwiftPackageReference "swift-nonempty" */;
+			productName = NonEmpty;
+		};
+		B67E4E052D1F376200F05334 /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B67E4E042D1F376200F05334 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B6AAA68B2D1B90E6008EE91D /* Project object */;
 }

@@ -4,7 +4,7 @@ import InputMethodKit
 @objc(InputController)
 class InputController: IMKInputController {
 
-	private var currentNode: Node?
+	private var currentState: String?
 	private let noRange = NSRange(location: NSNotFound, length: NSNotFound)
 
 	override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
@@ -14,35 +14,34 @@ class InputController: IMKInputController {
 
 		switch translateToKeyEvent(event) {
 		case .character(let newCharacter):
-			if let nextNode = nextNode(matching: newCharacter) {
-				commitNodeIfLeafElseMark(nextNode, using: textInputClient)
+			if let nextState = self.nextState(matching: newCharacter) {
+				self.commitStateIfLeafElseMark(nextState, using: textInputClient)
 				return true
 			} else {
 
-				if let currentNode = self.currentNode {
-					commit(currentNode, using: textInputClient)
+				if let currentState = self.currentState {
+					self.commit(currentState, using: textInputClient)
 				}
-				if let nextNode = nextNode(matching: newCharacter) {
-					commitNodeIfLeafElseMark(nextNode, using: textInputClient)
+				if let nextState = self.nextState(matching: newCharacter) {
+					self.commitStateIfLeafElseMark(nextState, using: textInputClient)
 					return true
 				}
 			}
 
 		case .delete:
-			if currentNode != nil {
-				currentNode = nil
+			if self.currentState != nil {
+				self.currentState = nil
 				textInputClient.setMarkedText(
 					"",
-					selectionRange: noRange,
-					replacementRange: noRange
+					selectionRange: self.noRange,
+					replacementRange: self.noRange
 				)
 				return true
 			}
 
 		case .unknown:
-			if let currentNode = self.currentNode {
-				commit(currentNode, using: textInputClient)
-				return true
+			if let currentState = self.currentState {
+				self.commit(currentState, using: textInputClient)
 			}
 
 		}
@@ -54,7 +53,7 @@ class InputController: IMKInputController {
 			return .delete
 		} else if
 			let characters = event.characters,
-			isPrintable(characters),
+			self.isPrintable(characters),
 			let firstCharacter = characters.first
 		{
 			return .character(firstCharacter)
@@ -65,43 +64,50 @@ class InputController: IMKInputController {
 
 	private func isPrintable(_ text: String) -> Bool {
 		let printable: CharacterSet = [
-			CharacterSet.alphanumerics,
-			CharacterSet.symbols,
-			CharacterSet.punctuationCharacters,
+			.alphanumerics,
+			.symbols,
+			.punctuationCharacters,
 		].reduce(CharacterSet()) { $0.union($1) }
 
 		return !text.unicodeScalars.contains { !printable.contains($0) }
 	}
 
-	private func nextNode(matching targetCharacter: Character) -> Node? {
-		let searchSpace = self.currentNode?.children ?? rootNodes
-		return searchSpace[targetCharacter]
-	}
-
-	private func commitNodeIfLeafElseMark(
-		_ node: Node,
-		using textInputClient: IMKTextInput
-	) {
-		if node.children.isEmpty {
-			commit(node, using: textInputClient)
+	private func nextState(matching targetCharacter: Character) -> String? {
+		if let currentState = self.currentState {
+			return transitions[currentState]?[targetCharacter]
 		} else {
-			textInputClient.setMarkedText(
-				node.mapping,
-				selectionRange: noRange,
-				replacementRange: noRange
-			)
-			currentNode = node
+			if rootStates.contains(targetCharacter) {
+				return String(targetCharacter)
+			} else {
+				return nil
+			}
 		}
 	}
 
-	private func commit(_ node: Node, using textInputClient: IMKTextInput) {
+	private func commitStateIfLeafElseMark(
+		_ state: String,
+		using textInputClient: IMKTextInput
+	) {
+		if transitions[state] == nil {
+			self.commit(state, using: textInputClient)
+		} else {
+			textInputClient.setMarkedText(
+				state,
+				selectionRange: self.noRange,
+				replacementRange: self.noRange
+			)
+			self.currentState = state
+		}
+	}
+
+	private func commit(_ state: String, using textInputClient: IMKTextInput) {
 		textInputClient.setMarkedText(
 			"",
 			selectionRange: self.noRange,
 			replacementRange: self.noRange
 		)
-		textInputClient.insertText(node.mapping, replacementRange: self.noRange)
-		self.currentNode = nil
+		textInputClient.insertText(state, replacementRange: self.noRange)
+		self.currentState = nil
 	}
 }
 
