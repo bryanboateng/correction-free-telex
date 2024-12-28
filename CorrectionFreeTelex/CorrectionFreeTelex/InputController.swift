@@ -76,7 +76,7 @@ class InputController: IMKInputController {
 		if let currentState = self.currentState {
 			return transitions[currentState]?[targetCharacter]
 		} else {
-			if rootStates.contains(targetCharacter) {
+			if entryStates.contains(targetCharacter) {
 				return String(targetCharacter)
 			} else {
 				return nil

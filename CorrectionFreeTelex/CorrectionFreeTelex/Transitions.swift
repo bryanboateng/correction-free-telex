@@ -14,7 +14,7 @@ private struct Vowel {
 	]
 }
 
-let rootStates: Set<Character> = ["a", "d", "e", "i", "o", "u", "y"]
+let entryStates: Set<Character> = ["a", "d", "e", "i", "o", "u", "y"]
 
 let transitions: [String: NonEmpty<[Character: String]>] = {
 	var transitions: [String: NonEmpty<[Character: String]>] = [:]
