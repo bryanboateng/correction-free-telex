@@ -14,7 +14,7 @@ private struct Vowel {
 	]
 }
 
-let entryStates: Set<Character> = ["a", "d", "e", "i", "o", "u", "y"]
+let entryStates: Set<Character> = ["a", "A", "d", "D", "e", "E", "i", "I", "o", "O", "u", "U", "y", "Y"]
 
 let transitions: [String: NonEmpty<[Character: String]>] = {
 	var transitions: [String: NonEmpty<[Character: String]>] = [:]
@@ -54,8 +54,8 @@ let transitions: [String: NonEmpty<[Character: String]>] = {
 	insertVowelTransitions(from: u, to: ư, using: "w", into: &transitions)
 	insertDecompositionTransitions(for: ư, resettingTo: u, and: "w", into: &transitions)
 
-	insertTransition(from: "d", to: "đ", using: "d", into: &transitions)
-	insertTransition(from: "đ", to: "dd", using: "d", into: &transitions)
+	insertCasedTransitions(from: "d", to: "đ", using: "d", into: &transitions)
+	insertDecompositionTransitions(for: "đ", resettingTo: "d", and: "d", into: &transitions)
 
 	insertToneTransitions(for: a, into: &transitions)
 	insertToneTransitions(for: â, into: &transitions)
@@ -80,29 +80,49 @@ private func insertVowelTransitions(
 	into transitions: inout [String: NonEmpty<[Character: String]>]
 ) {
 	for toneKeyPath in Vowel.toneKeyPaths {
-		insertTransition(
-			from: String(originVowel[keyPath: toneKeyPath]),
-			to: String(destinationVowel[keyPath: toneKeyPath]),
+		insertCasedTransitions(
+			from: originVowel[keyPath: toneKeyPath],
+			to: destinationVowel[keyPath: toneKeyPath],
 			using: input,
 			into: &transitions
 		)
 	}
 }
 
-private func insertDecompositionTransitions(
-	for originVowel: Vowel,
-	resettingTo resetVowel: Vowel,
-	and input: Character,
+private func insertCasedTransitions(
+	from originCharacter: Character,
+	to destinationCharacter: Character,
+	using input: Character,
 	into transitions: inout [String: NonEmpty<[Character: String]>]
 ) {
-	for tonePath in Vowel.toneKeyPaths {
-		insertTransition(
-			from: String(originVowel[keyPath: tonePath]),
-			to: "\(resetVowel[keyPath: tonePath])\(input)",
-			using: input,
-			into: &transitions
-		)
-	}
+	let uppercasedOriginCharacter = Character(originCharacter.uppercased())
+	let uppercasedDestinationCharacter = Character(destinationCharacter.uppercased())
+	let uppercasedInput = Character(input.uppercased())
+
+	insertTransition(
+		from: String(originCharacter),
+		to: String(destinationCharacter),
+		using: input,
+		into: &transitions
+	)
+	insertTransition(
+		from: String(originCharacter),
+		to: String(destinationCharacter),
+		using: uppercasedInput,
+		into: &transitions
+	)
+	insertTransition(
+		from: String(uppercasedOriginCharacter),
+		to: String(uppercasedDestinationCharacter),
+		using: input,
+		into: &transitions
+	)
+	insertTransition(
+		from: String(uppercasedOriginCharacter),
+		to: String(uppercasedDestinationCharacter),
+		using: uppercasedInput,
+		into: &transitions
+	)
 }
 
 private func insertTransition(
@@ -122,21 +142,73 @@ private func insertTransition(
 	}
 }
 
+private func insertDecompositionTransitions(
+	for originVowel: Vowel,
+	resettingTo resetVowel: Vowel,
+	and input: Character,
+	into transitions: inout [String: NonEmpty<[Character: String]>]
+) {
+	for tonePath in Vowel.toneKeyPaths {
+		insertDecompositionTransitions(
+			for: originVowel[keyPath: tonePath],
+			resettingTo: resetVowel[keyPath: tonePath],
+			and: input,
+			into: &transitions
+		)
+	}
+}
+
+private func insertDecompositionTransitions(
+	for originCharacter: Character,
+	resettingTo resetCharacter: Character,
+	and input: Character,
+	into transitions: inout [String: NonEmpty<[Character: String]>]
+) {
+	let uppercasedOriginCharacter = Character(originCharacter.uppercased())
+	let uppercasedResetCharacter = Character(resetCharacter.uppercased())
+	let uppercasedInput = Character(input.uppercased())
+
+	insertTransition(
+		from: String(originCharacter),
+		to: "\(resetCharacter)\(input)",
+		using: input,
+		into: &transitions
+	)
+	insertTransition(
+		from: String(uppercasedOriginCharacter),
+		to: "\(uppercasedResetCharacter)\(input)",
+		using: input,
+		into: &transitions
+	)
+	insertTransition(
+		from: String(originCharacter),
+		to: "\(resetCharacter)\(uppercasedInput)",
+		using: uppercasedInput,
+		into: &transitions
+	)
+	insertTransition(
+		from: String(uppercasedOriginCharacter),
+		to: "\(uppercasedResetCharacter)\(uppercasedInput)",
+		using: uppercasedInput,
+		into: &transitions
+	)
+}
+
 private func insertToneTransitions(
 	for vowel: Vowel,
 	into transitions: inout [String: NonEmpty<[Character: String]>]
 ) {
-	let inputToToneMap: [Character: String] = [
-		"z": String(vowel.ngangTone),
-		"f": String(vowel.huyềnTone),
-		"s": String(vowel.sắcTone),
-		"r": String(vowel.hỏiTone),
-		"x": String(vowel.ngãTone),
-		"j": String(vowel.nặngTone),
+	let inputToToneMap: [Character: Character] = [
+		"z": vowel.ngangTone,
+		"f": vowel.huyềnTone,
+		"s": vowel.sắcTone,
+		"r": vowel.hỏiTone,
+		"x": vowel.ngãTone,
+		"j": vowel.nặngTone,
 	]
 
 	for pair in inputToToneMap.permutations(ofCount: 2) {
-		insertTransition(
+		insertCasedTransitions(
 			from: pair[0].value,
 			to: pair[1].value,
 			using: pair[1].key,
@@ -145,10 +217,10 @@ private func insertToneTransitions(
 	}
 
 	for (input, toneForm) in inputToToneMap {
-		insertTransition(
-			from: toneForm,
-			to: "\(vowel.ngangTone)\(input)",
-			using: input,
+		insertDecompositionTransitions(
+			for: toneForm,
+			resettingTo: vowel.ngangTone,
+			and: input,
 			into: &transitions
 		)
 	}
