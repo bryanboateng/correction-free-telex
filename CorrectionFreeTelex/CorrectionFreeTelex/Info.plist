@@ -6,6 +6,10 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>$(PRODUCT_MODULE_NAME).InputController</string>
+	<key>TICapsLockLanguageSwitchCapable</key>
+	<true/>
+	<key>TISDoubleSpaceSubstitution</key>
+	<string>. </string>
 	<key>TISIntendedLanguage</key>
 	<string>vi</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
