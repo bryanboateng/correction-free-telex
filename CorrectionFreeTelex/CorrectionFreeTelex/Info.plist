@@ -10,11 +10,15 @@
 	<true/>
 	<key>TISDoubleSpaceSubstitution</key>
 	<string>. </string>
+	<key>TISIconIsTemplate</key>
+	<true/>
 	<key>TISIntendedLanguage</key>
 	<string>vi</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
 	<array>
 		<string>Latn</string>
 	</array>
+	<key>tsInputMethodIconFileKey</key>
+	<string>Icon.svg</string>
 </dict>
 </plist>
