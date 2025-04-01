@@ -5,60 +5,48 @@ import InputMethodKit
 class InputController: IMKInputController {
 
 	private var currentState: String?
-	private let noRange = NSRange(location: NSNotFound, length: NSNotFound)
 
 	override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
 		guard let textInputClient = sender as? IMKTextInput else {
 			return false
 		}
 
-		switch translateToKeyEvent(event) {
-		case .character(let newCharacter):
+		guard let newCharacter = self.firstPrintableCharacter(in: event) else {
+			self.currentState = nil
+			return false
+		}
+
+		if let nextState = self.nextState(matching: newCharacter) {
+			self.currentState = nextState
+
+			if entryStates.contains(nextState) {
+				self.insert(nextState, into: textInputClient)
+			} else {
+				self.replaceText(nextState, textInputClient: textInputClient)
+			}
+			return true
+		} else {
+			self.currentState = nil
+
 			if let nextState = self.nextState(matching: newCharacter) {
-				self.commitStateIfLeafElseMark(nextState, using: textInputClient)
+				self.currentState = nextState
+				self.insert(nextState, into: textInputClient)
 				return true
 			} else {
-
-				if let currentState = self.currentState {
-					self.commit(currentState, using: textInputClient)
-				}
-				if let nextState = self.nextState(matching: newCharacter) {
-					self.commitStateIfLeafElseMark(nextState, using: textInputClient)
-					return true
-				}
+				return false
 			}
-
-		case .delete:
-			if self.currentState != nil {
-				self.currentState = nil
-				textInputClient.setMarkedText(
-					"",
-					selectionRange: self.noRange,
-					replacementRange: self.noRange
-				)
-				return true
-			}
-
-		case .unknown:
-			if let currentState = self.currentState {
-				self.commit(currentState, using: textInputClient)
-			}
-
 		}
-		return false
 	}
 
-	private func translateToKeyEvent(_ event: NSEvent) -> KeyEvent {
-		if event.keyCode == 51 {
-			return .delete
-		} else if
+	private func firstPrintableCharacter(in event: NSEvent) -> Character? {
+		if
 			let characters = event.characters,
 			self.isPrintable(characters),
 			let firstCharacter = characters.first
 		{
-			return .character(firstCharacter)
+			return firstCharacter
 		} else {
-			return .unknown
+			return nil
 		}
 	}
 
@@ -84,35 +72,19 @@ class InputController: IMKInputController {
 		}
 	}
 
-	private func commitStateIfLeafElseMark(
-		_ state: String,
-		using textInputClient: IMKTextInput
-	) {
-		if transitions[state] == nil {
-			self.commit(state, using: textInputClient)
+	private func insert(_ text: String, into textInputClient: IMKTextInput) {
+		textInputClient.insertText(text, replacementRange: replacementRange())
+	}
+
+	private func replaceText(_ text: String, textInputClient: IMKTextInput) {
+		let selectedRange = textInputClient.selectedRange()
+
+		if selectedRange != NSRange(location: NSNotFound, length: NSNotFound) && selectedRange.location > 0 {
+			let replacementLength = selectedRange.length == 0 ? 1 : selectedRange.length + 1
+			let replacementRange = NSRange(location: selectedRange.location - 1, length: replacementLength)
+			textInputClient.insertText(text, replacementRange: replacementRange)
 		} else {
-			textInputClient.setMarkedText(
-				state,
-				selectionRange: self.noRange,
-				replacementRange: self.noRange
-			)
-			self.currentState = state
+			textInputClient.insertText(text, replacementRange: replacementRange())
 		}
 	}
-
-	private func commit(_ state: String, using textInputClient: IMKTextInput) {
-		textInputClient.setMarkedText(
-			"",
-			selectionRange: self.noRange,
-			replacementRange: self.noRange
-		)
-		textInputClient.insertText(state, replacementRange: self.noRange)
-		self.currentState = nil
-	}
-}
-
-fileprivate enum KeyEvent {
-	case character(Character)
-	case delete
-	case unknown
 }
